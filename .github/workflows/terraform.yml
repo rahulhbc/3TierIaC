@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main  # Runs on pull request to main branch
+  workflow_dispatch:
 
 jobs:
   terraform:
@@ -51,3 +52,20 @@ jobs:
         if: github.ref == 'refs/heads/main'  # Only applies changes on main branch
         run: terraform apply -auto-approve
         working-directory: multi_tier_arch
+
+  manual_destroy:
+    name: Manual Destroy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps: 
+      - name: Checkout Repository
+        run: actions/checkout@v3
+
+      - name: Setup Terraform
+        run: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy (Manual)
+        run: terraform destroy -auto-approve
